@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Vidoes Downloader</title>
+
+    <!-- coustom css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- for the iconn -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <nav class="navbar">
+
+        <div class="logo">
+            <img src="{{url_for('static', filename='images/logo.png')}}" alt="">
+            <p class="text">YT Downloader</p>
+        </div>
+        <p class="menu bx bx-menu"></p>
+
+    </nav>
+
+    <p class="heading">Download videos from YouTube HD</p>
+    <form method="post" onsubmit="showLoader(); clearPreviousContent();">
+        <div class="search-bar">
+            <input type="text" placeholder="Enter URL of YouTube Video... " id="video_url" name="video_url" required>
+            <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
+        </div>
+    </form>
+
+    <div class="loader" id="loader" style="display:none;">
+        <img src="{{ url_for('static', filename='images/loader.gif') }}" alt="Loading...">
+    </div>
+
+    <div class="video-info" id="video-info">
+        {% if thumbnail_url %}
+        <div class="thumbnail-container">
+            <img src="{{ thumbnail_url }}" alt="YouTube Thumbnail" class="thumbnail" id="thumbnail">
+            <video id="videoPlayer" controls style="display: none; ">
+                <source src="{{ video_play_url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <button class="play-button" onclick="startVideo()"><i class='bx bx-play' id="playPauseIcon"></i></button>
+        </div>
+        <div class="details">
+            {% if video_title %}
+            <p>{{ video_title }}</p>
+            {% endif %}
+            {% if video_length %}
+            <p>Duration: {{ video_length }} </p>
+            {% endif %}
+        </div>
+        {% elif error %}
+        <p>{{ error }}</p>
+        {% endif %}
+    </div>
+    
+
+    {% if video_options or mp3_options or audio_options %}
+    <div class="tabs" id="tabs">
+        <p class="tablink active" onclick="openTab('video')">Video</p>
+        <p class="tablink" onclick="openTab('mp3')">Mp3</p>
+        <p class="tablink" onclick="openTab('audio')">Audio</p>
+    </div>
+
+
+    <div class="download-options" id="download-options">
+        <table id="video">
+            <thead>
+                <tr>
+                    <th>Resolution</th>
+                    <th>File Size</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for option in video_options %}
+                <tr>
+                    <td>{{ option.resolution }}</td>
+                    <td>{{ option.size }}</td>
+                    <td>
+                        <form method="post" action="/" style="display:inline;">
+                            <input type="hidden" name="download_itag" value="{{ option.stream_id }}">
+                            <input type="hidden" name="video_url" value="{{ video_url }}">
+                            <button type="submit" name="action" value="download"><i class="bx bxs-download"></i>
+                                Download</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table id="mp3">
+            <thead>
+                <tr>
+                    <th>Quality</th>
+                    <th>File Size</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for option in mp3_options %}
+                <tr>
+                    <td>{{ option.quality }}</td>
+                    <td>{{ option.size }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            <input type="hidden" name="download_itag" value="{{ option.stream_id }}">
+                            <input type="hidden" name="video_url" value="{{ video_url }}">
+                            <button type="submit" name="action" value="download"><i class="bx bxs-download"></i>
+                                Download</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table id="audio">
+            <thead>
+                <tr>
+                    <th>Format</th>
+                    <th>File Size</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for option in audio_options %}
+                <tr>
+                    <td>{{ option.format }}</td>
+                    <td>{{ option.size }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            <input type="hidden" name="download_itag" value="{{ option.stream_id }}">
+                            <input type="hidden" name="video_url" value="{{ video_url }}">
+                            <button type="submit" name="action" value="download"><i class="bx bxs-download"></i>
+                                Download</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <hr>
+    <div class="container">
+        <h1>Instructions</h1>
+        <ol>
+            <li>Paste the link of YouTube you want to download.</li>
+            <li>Click "Search" button to begin process.</li>
+            <li>Select the video/audio format you want to download, then click "Download" button.</li>
+        </ol>
+        <h2>Features</h2>
+        <ul>
+            <li>Unlimited downloads and always free.</li>
+            <li>High-speed video downloader.</li>
+            <li>No registration requirement.</li>
+            <li>Support downloading with all formats.</li>
+        </ul>
+    </div>
+    <hr>
+    <div class="container_2">
+
+        <section class="intro">
+            <h1>Online YouTube Video Downloader</h1>
+            <p>
+                Y2meta.app allows you to download video from YouTube to
+                Mp3, Mp4 in HD. Y2meta supports downloading all video formats such as: MP4, M4V, 3GP, WMV, FLV, MO, MP3,
+                WEBM, etc. You can easily download for free thousands of videos from YouTube.
+            </p>
+        </section>
+
+        <hr>
+
+        <section class="features">
+            <div class="feature">
+                <img src="{{url_for('static', filename='images/python.jpg')}}" alt="">
+
+                <h2>Free Download</h2>
+                <p>Unlimitedly free conversions and downloads.</p>
+            </div>
+            <div class="feature">
+                <img src="{{url_for('static', filename='images/video-audio.png')}}" alt="">
+                <h2>Video & Audio</h2>
+                <p>Directly Download Video & Music.</p>
+            </div>
+            <div class="feature">
+                <img src="{{url_for('static', filename='images/easy_dowload.png')}}" alt="">
+                <h2>Easy Download</h2>
+                <p>Fully compatible with all browsers.</p>
+            </div>
+        </section>
+    </div>
+    <hr style="margin-top: 10px;">
+
+
+    <footer>
+        <p><i class='bx bx-copyright'></i>2024 YT Downloader.app</p>
+        <nav>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('contact') }}">Contact</a>
+            <a href="{{ url_for('terms') }}">Terms of Service</a>
+            <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+        </nav>
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
